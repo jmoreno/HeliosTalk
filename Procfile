@@ -1,1 +1,1 @@
-web: node Gruntfile.js
+web: ./node_modules/grunt/.bin/grunt connect ; node Gruntfile.js
