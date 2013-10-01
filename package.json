@@ -2,7 +2,7 @@
 	"author": "Javi Moreno featuring (reveal.js by Hakim El Hattab)",
 	"name": "revealjs",
 	"description": "Helios y su integración con iOS",
-	"version": "1.0",
+	"version": "2.5.1",
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:jmoreno/HeliosTalk.git"
