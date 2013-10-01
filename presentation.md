@@ -1,15 +1,15 @@
-## [helios](http://helios.io/),  an extensible [open-source](https://github.com/helios-framework/helios) mobile backend framework
+### [helios](http://helios.io/),  an extensible [open-source](https://github.com/helios-framework/helios) mobile backend framework
 
-### Ya, pero... ¿qué es?
+#### si, si, pero... ¿qué es?
 
 * Aplicación Ruby construida sobre [Rack](http://rack.github.io/).
 * Compuesto por varias aplicaciones Ruby hechas con Sinatra.
 * Con una pequeña interfaz de administración web.
 
 Note:
-Rack es una especificación y una librería que permite a aplicaciones desarrolladas en Ruby, independietemente del framework elegido para desarrollarlas interactuar entre si. Para ello, obviamente tienen que soportar Rack. Gracias a esto, Helios se puede usar por si mismo, en aplicaciones hechas en Sinatra y en aplicaciones hechas en Rails.
-En realidad, y como veremos a continuación, Helios se compone de varias aplicaciones hechas en Sinatra.
-Sobre toda esta capa modular, Helios también incluye un pequeño front para realizar consultas.
+Rack es una especificación y una librería que permite a aplicaciones desarrolladas en Ruby, independietemente del framework elegido para desarrollarlas interactuar entre si. Para ello, obviamente tienen que soportar Rack. Gracias a esto, Helios se puede usar por si mismo, en aplicaciones hechas en Sinatra y en aplicaciones hechas en Rails.    
+En realidad, y como veremos a continuación, Helios se compone de varias aplicaciones hechas en Sinatra.    
+Sobre toda esta capa modular, Helios también incluye un pequeño front para realizar consultas.   
 Supongo que la idea de todo esto es ir creciendo, tanto en el número de módulos que integra el framework como en las habilidades de la parte front. En cualquier caso, si por si solo no crece, ya es un buen punto de partida para que nosotros vayamos incorporando otros módulos que sean de interés para nuestras aplicaciones.
 
 
@@ -110,16 +110,18 @@ El servicio que se encarga de hacer la notificación push contra los servidores 
 
 * Integración con Helios
 
-    - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
-    {
-        NSURL *serverURL = [NSURL URLWithString:@"http://demo.helios.javimoreno.me/devices/"];
-        Orbiter *orbiter = [[Orbiter alloc] initWithBaseURL:serverURL credential:nil];
-        [orbiter registerDeviceToken:deviceToken withAlias:nil success:^(id responseObject) {
-            NSLog(@"Registration Success: %@", responseObject);
-        } failure:^(NSError *error) {
-            NSLog(@"Registration Error: %@", error);
-        }];
-    }
+```
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSURL *serverURL = [NSURL URLWithString:@"http://demo.helios.javimoreno.me/devices/"];
+    Orbiter *orbiter = [[Orbiter alloc] initWithBaseURL:serverURL credential:nil];
+    [orbiter registerDeviceToken:deviceToken withAlias:nil success:^(id responseObject) {
+        NSLog(@"Registration Success: %@", responseObject);
+    } failure:^(NSError *error) {
+        NSLog(@"Registration Error: %@", error);
+    }];
+}
+```
     
 * También con Parse y Urban Airship
 
@@ -169,16 +171,18 @@ Como ya hemos dicho antes, el servicio que realiza la verificación del recibo c
 
 * Lista de productos disponibles:
 
-    NSURL *url = [NSURL URLWithString:@"http://demo.helios.javimoreno.me/products/identifiers/"];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    [[CargoBay sharedManager] productsWithRequest:request success:^(NSArray *products, NSArray *invalidIdentifiers) {
-        NSLog(@"Products: %@", products);
-        NSLog(@"Invalid Identifiers: %@", invalidIdentifiers);
-        _productsArray = [NSMutableArray arrayWithArray:products];
-        [self.tableView reloadData];
-    } failure:^(NSError *error) {
-        NSLog(@"Error: %@", [error description]);
-    }];
+```
+NSURL *url = [NSURL URLWithString:@"http://demo.helios.javimoreno.me/in_app_purchase/products/identifiers/"];
+NSURLRequest *request = [NSURLRequest requestWithURL:url];
+[[CargoBay sharedManager] productsWithRequest:request success:^(NSArray *products, NSArray *invalidIdentifiers) {
+    NSLog(@"Products: %@", products);
+    NSLog(@"Invalid Identifiers: %@", invalidIdentifiers);
+    _productsArray = [NSMutableArray arrayWithArray:products];
+    [self.tableView reloadData];
+} failure:^(NSError *error) {
+    NSLog(@"Error: %@", [error description]);
+}];
+ ```
 
 Note:
 La librería Cargo Bay es, el AFNetworking de las In-App Purchases: sencilla, ligera y útil. Por un lado proporciona un método para descargar la lista de productos disponibles de nuestro servidor, cruzarlos con los que tenemos registrados en iTunes Connect y devolver dos arrays, uno con los productos que se pueden consumir y otro con los que no se pueden consumir. Aunque esto pueda parecer un sinsentido, si quisieramos quitar un In-App Purchase que estuviera dando algún problema, la forma más eficaz de hacerlo sería quitandolo de nuestro servidor. Por lo que podemos hacernos una idea de la importancia de este método.
@@ -188,15 +192,17 @@ La librería Cargo Bay es, el AFNetworking de las In-App Purchases: sencilla, li
 
 * Seguimiento de los pagos:
 
-    - (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)options {
-      [[CargoBay sharedManager] setPaymentQueueUpdatedTransactionsBlock:^(SKPaymentQueue *queue, NSArray *transactions) {
+```
+- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)options {
+    [[CargoBay sharedManager] setPaymentQueueUpdatedTransactionsBlock:^(SKPaymentQueue *queue, NSArray *transactions) {
         NSLog(@"Updated Transactions: %@", transactions);
-      }];
+    }];
 
-      [[SKPaymentQueue defaultQueue] addTransactionObserver:[CargoBay sharedManager]];
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:[CargoBay sharedManager]];
 
-      // ...
-    }
+    // ...
+}
+```
 
 Note:
 Cuando realizamos compras dentro de nuestra aplicación, hay que poner un "observer" que nos informe de cuando se ha realizado la compra para hacer lo que corresponda: descargar contenido, cambiar los ajustes, etc. Cargo Bay se encarga de estas taréas.
@@ -206,11 +212,13 @@ Cuando realizamos compras dentro de nuestra aplicación, hay que poner un "obser
 
 * Verificación de la compra:
 
-    [[CargoBay sharedManager] verifyTransaction:transaction password:nil success:^(NSDictionary *receipt) {
-      NSLog(@"Receipt: %@", receipt);
-    } failure:^(NSError *error) {
-        NSLog(@"Error %d (%@)", [error code], [error localizedDescription]);
-    }];
+```
+[[CargoBay sharedManager] verifyTransaction:transaction password:nil success:^(NSDictionary *receipt) {
+    NSLog(@"Receipt: %@", receipt);
+} failure:^(NSError *error) {
+    NSLog(@"Error %d (%@)", [error code], [error localizedDescription]);
+}];
+```
 
 Note:
 Por último, aunque en iOS 7 ya hay un método nuevo dentro del framework de StoreKit para realizar la verificación de los recibos desde la propia aplicación contra los servidores de Apple, Cargo Bay lo hace tanto para iOS 7 como para versiones anteriores de iOS.
